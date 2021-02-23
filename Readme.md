@@ -3,7 +3,7 @@
 Toda la configuración de terraform se encuenta en el directorio con el mismo nombre.
 
 ## Estructura
-- [credentials.tf](Terraform/credentials.tf): No se añade en el repositorio GitHub dado que contiene información sensible (Se añade en .gitignore)
+- credentials.tf: No se añade en el repositorio GitHub dado que contiene información sensible (Se añade en .gitignore)
 - [main.tf](Terraform/main.tf): 
 - [network.tf](Terraform/network.tf)
 - [security.tf](Terraform/security.tf)
@@ -31,4 +31,5 @@ terraform destroy
 # Ansible
 ## Directorio
 Toda la configuración de ansible se encuenta en el directorio con el mismo nombre.
-PENDIENTE...
+
+PENDIENTE DE COMPLETAR
