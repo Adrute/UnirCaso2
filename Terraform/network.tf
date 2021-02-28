@@ -23,12 +23,13 @@ resource "azurerm_subnet" "mySubnet" {
 
 }
 
-# Create NIC
+# Creación de NIC
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface
 
-resource "azurerm_network_interface" "myNic" {
-  name                = "nic-${var.vms[count.index]}" 
-  count               = length(var.vms)
+# Nic para master y nfs
+resource "azurerm_network_interface" "myNicMasterNfs" {
+  name                = "nic-${var.vms_master_nfs[count.index]}" 
+  count               = length(var.vms_master_nfs)
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
@@ -37,7 +38,28 @@ resource "azurerm_network_interface" "myNic" {
     subnet_id                      = azurerm_subnet.mySubnet.id 
     private_ip_address_allocation  = "Static"
     private_ip_address             = "10.0.1.${count.index + 10}"
-    public_ip_address_id           = azurerm_public_ip.myPublicIp[count.index].id
+    public_ip_address_id           = azurerm_public_ip.myPublicIpMasterNfs[count.index].id
+  }
+
+    tags = {
+        environment = "CP2"
+    }
+
+}
+
+# Nic para workers
+resource "azurerm_network_interface" "myNicWorkers" {
+  name                = "nic-${var.vms_workers[count.index]}" 
+  count               = length(var.vms_workers)
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+    ip_configuration {
+    name                           = "myipconfiguration1"
+    subnet_id                      = azurerm_subnet.mySubnet.id 
+    private_ip_address_allocation  = "Static"
+    private_ip_address             = "10.0.1.${count.index + 11}"
+    public_ip_address_id           = azurerm_public_ip.myPublicIpWorkers[count.index].id
   }
 
     tags = {
@@ -49,9 +71,25 @@ resource "azurerm_network_interface" "myNic" {
 # IP pública
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip
 
-resource "azurerm_public_ip" "myPublicIp" {
-  name                = "pubip-${var.vms[count.index]}"
-  count               = length(var.vms)
+# Public IP para master y nfs
+resource "azurerm_public_ip" "myPublicIpMasterNfs" {
+  name                = "pubip-${var.vms_master_nfs[count.index]}"
+  count               = length(var.vms_master_nfs)
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Dynamic"
+  sku                 = "Basic"
+
+    tags = {
+        environment = "CP2"
+    }
+
+}
+
+# Public IP para workers
+resource "azurerm_public_ip" "myPublicIpWorkers" {
+  name                = "pubip-${var.vms_workers[count.index]}"
+  count               = length(var.vms_workers)
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Dynamic"
