@@ -1,3 +1,10 @@
+# Preparación previa
+## Claves ssh
+Generamos las claves pública/privada para poder conectar desde el PC a las máquinas generadas. Por simplicidad en la práctica se ha decidido no generar passphrase:
+```
+ssh-keygen -t rsa
+```
+
 # Terraform
 ## Directorio
 Toda la configuración de terraform se encuenta en el directorio con el mismo nombre.

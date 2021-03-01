@@ -1,0 +1,29 @@
+---
+- name: Timezone
+  shell: timedatectl set-timezone Europe/Madrid && timedatectl set-ntp true
+
+- name: Deshabilitamos Swap en todos los nodos
+  shell: swapoff -a
+
+- name: Comentamos todas las entradas de Swap en la ruta /etc/fstab
+  replace:
+    path: /etc/fstab
+    regexp: '(^/.*swap*)'
+    replace: '# \1'
+
+- name: Instalaciones (NFS-UTILS,NFS4-ACL-TOOLS,WGET,PYTHON3...)
+  dnf:
+      name: ['chrony','python3','nfs-utils','nfs4-acl-tools','wget']
+      state: latest
+
+- name: Activar Chrony
+  service: 
+    name: chronyd
+    enabled: yes
+    state: started
+
+- name: Activar Firewalld
+  service:
+    name: firewalld
+    enabled: yes
+    state: started
