@@ -1,6 +1,8 @@
 # 1) Preparación previa
-## Preparamos nuestro entorno para la configuración con Azure
-### - Login Azure
+
+## Preparamos nuestro entorno para la configuración con Azure
+
+### - Login Azure
 Lanzamos el siguiente comando con el que se abrirá el navegador para poder iniciar sesión:
 ```
 az login
@@ -12,7 +14,7 @@ az account set --subscription={{ SUBSCRIPTION_ID }}
 ```
 _Podemos encotnrarlo en la página "[Suscripciones](https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade)" de Azure._
 
-### - Creamos el servicio principal
+### - Creamos el servicio principal
 ```
 az ad sp create-for-rbac --role="Contributor" -n "{{ NOMBRE_SERVICIO }}"
 ```
@@ -58,7 +60,7 @@ Toda la configuración de terraform se encuenta en el directorio con el mismo no
 - [vars.tf](Terraform/vars.tf): Variable para poder utilizar en el resto de ficheros de configuración
 - [vm.tf](Terraform/vm.tf): Contiene la configuración de las máquinas virtuales
 
-## Comandos
+## Pasos a seguir
 ### - Inicializar configuración
 ```
 terraform init
@@ -84,8 +86,8 @@ Toda la configuración de ansible se encuenta en el directorio con el mismo nomb
 
 ## Estructura
 
-## Comandos
-### - Aplicamos la configuración común para todas las máquina
+## Pasos a seguir
+### - Aplicamos la configuración común para todas las máquina
 ```
 ansible-playbook -i hosts.yaml 1_ConfiguracionInicial.yml
 ```
