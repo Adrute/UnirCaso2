@@ -1,0 +1,13 @@
+---
+- name: install nfs-utils
+  yum: name=nfs-utils state=latest
+  
+- name: Creamos el directorio que montaremos si no existe
+  file:
+    path: '{{ nfsPathWorkers }}'
+    state: directory
+    owner: adminUsername
+    group: adminUsername
+    mode: '0775'
+- name: Montamos el volumen
+  shell: sudo mount -t nfs {{ nfsIp }}:{{ nfsPath }} {{ nfsPathWorkers }}
