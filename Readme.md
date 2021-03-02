@@ -69,16 +69,14 @@ terraform init
 ### - Aplicar cambios y desplegar
 ```
 terraform apply
-
-## Si queremos que no nos pida confirmación podemos añadir el parámetro "--auto-approve"
 ``` 
->_Pedirá confirmación de los cambios que va a aplicar._
+>_Si queremos que no nos pida confirmación de los cambios podemos añadir el parámetro "--auto-approve"._
 
 ### - Eliminar la configuración indicada en los ficheros
 ```
 terraform destroy
 ```
->_Pedirá confirmación de los cambios que va a aplicar._
+>_Si queremos que no nos pida confirmación de los cambios podemos añadir el parámetro "--auto-approve"._
 
 # 3) Ansible
 ## Directorio
