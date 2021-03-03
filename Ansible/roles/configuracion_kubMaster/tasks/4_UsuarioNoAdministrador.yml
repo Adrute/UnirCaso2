@@ -1,0 +1,29 @@
+---
+- name: Creamos el usuario
+  user:
+    name: kubeadmin
+    password: "{{ 'kubeadmin' | password_hash('sha512') }}"
+  when:  assigned_role == "no"
+
+- name: Creacion Directorio 
+  file:
+    path: '/home/kubeadmin/.kube'
+    state: directory
+
+- name: Copiamos admin.conf en el directorio
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: '/home/kubeadmin/.kube/config'
+    remote_src: yes
+
+- name: Aplicamos los permisos correspondientes
+  shell: chown kubeadmin. /home/kubeadmin/.kube/config
+
+- name: Configuración en /etc/sudoers.d/kubeadmin
+   lineinfile:
+       path: '/etc/sudoers.d/kubeadmin'
+       line: '{{item}}'
+       state: present
+       create: yes
+   with_items:
+      - 'ALL            ALL = (ALL) NOPASSWD: ALL'

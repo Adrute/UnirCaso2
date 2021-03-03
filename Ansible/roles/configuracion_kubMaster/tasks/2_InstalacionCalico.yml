@@ -1,0 +1,24 @@
+---
+- name: Instalamos Tigera
+  shell: |
+    kubectl create -f "{{ tigeraPath }}"
+
+- name: Descargamos el fichero custom-resources.yml y lanzamos kubectl apply
+  shell: |
+    wget {{ customResourcesPath }}
+    sed -i "13s/.*/      cidr: 192.169.0.0\/16/" custom-resources.yaml
+    kubectl apply -f custom-resources.yaml
+
+- name: Esperar a que Master este READY
+  shell: |
+    /usr/bin/kubectl get nodes
+  register: nodes
+  until:      
+    - '" Ready "  in nodes.stdout'      
+  retries: 50
+  delay: 10
+
+# Añadido por si funciona calico en Azure
+- name: Calico Azure
+  shell: |
+    kubectl apply -f {{ canalPath }}

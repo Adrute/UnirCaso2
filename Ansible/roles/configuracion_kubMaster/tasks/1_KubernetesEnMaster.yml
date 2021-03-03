@@ -1,0 +1,58 @@
+---
+- name: Configuramos Firewall
+  shell: |
+    firewall-cmd --permanent --add-port=6443/tcp
+    firewall-cmd --permanent --add-port=2379-2380/tcp
+    firewall-cmd --permanent --add-port=10250/tcp
+    firewall-cmd --permanent --add-port=10251/tcp
+    firewall-cmd --permanent --add-port=10252/tcp
+    firewall-cmd --permanent --add-port=10255/tcp
+    firewall-cmd --reload
+
+- name: Configuramos kubeadm
+  shell: |
+    kubeadm config images pull
+
+- name: Reseteamos kubeadm
+  shell: |
+    kubeadm reset -f
+
+- name: Permitimos acceso desde los workers
+  shell: |
+    firewall-cmd --permanent --add-rich-rule 'rule family=ipv4 source address={{ (hostvars[inventory_hostname]['publicIp'][1].ip) }}/32 accept'
+    firewall-cmd --permanent --add-rich-rule 'rule family=ipv4 source address={{ (hostvars[inventory_hostname]['publicIp'][2].ip) }}/32 accept'
+    firewall-cmd --reload
+
+- name: Obtenemos la IP del Docker
+  shell: |
+    ip a | grep eth0 | grep inet | awk '{print $2}'
+  register: dockerIp
+
+- name: Permitimos el acceso de los contenedores a localhost
+  shell: |
+    firewall-cmd --zone=public --permanent --add-rich-rule 'rule family=ipv4 source address={{dockerIp.stdout}} accept'
+    firewall-cmd --reload
+
+- name: Instalamos plugin CNI y guardamos el comando final
+  shell: |
+    kubeadm init --pod-network-cidr 192.169.0.0/16 | tail -2
+  register: kubeadmJoin
+
+- name: Generamos el fichero para guardar el comando join
+  local_action: file path=./joinCommand state=touch
+  become: no
+
+- name: Guardamos el comando en el fichero "kubeadmJoin" para utilizarlo más adelante
+  local_action: copy content={{ kubeadmJoin.stdout }} dest=./kubeadmJoin
+  become: no
+
+- name: Creamos el directorio "/root/.kube"
+  file:
+    path: /root/.kube
+    state: directory
+
+- name: Autorizamos al usuario root acceder al cluster para terminar la configuración
+  shell: |
+    cp -i /etc/kubernetes/admin.conf /root/.kube/config
+    chown $(id -u):$(id -g) /root/.kube/config
+    kubectl get nodes

@@ -21,11 +21,6 @@
     regexp: '(^/.*swap*)'
     replace: '# \1'
 
-#- name: Instalaciones
-#  dnf:
-#    name: ['chrony','python3','nfs-utils','nfs4-acl-tools','wget', 'rpcbind']
-#    state: latest
-#
 - name: 'Instalaciones'
   dnf:
     name: '{{ item }}'
@@ -49,3 +44,12 @@
     name: firewalld
     enabled: yes
     state: started
+
+- name: Mapeo /etc/hosts
+  lineinfile:
+      path: /etc/hosts
+      line: "{{item.ip}} {{item.hostname}}"
+      state: present
+      create: yes
+  with_items:
+     - "{{ (hostvars[inventory_hostname]['publicIp']) }}"

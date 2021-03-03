@@ -1,0 +1,16 @@
+---
+# tasks file for configuracion_kubWorkers
+- name: Abrimos los puertos
+  shell: |
+    firewall-cmd --zone=public --permanent --add-port={10250,30000-32767}/tcp
+    firewall-cmd --reload
+
+- name: Recuperamos el fichero con el comando join
+  copy: src=./kubeadmJoin dest=./kubeadmJoin  
+
+- name: Obtenemos el comando y lo guardamos en la variable kubeJoinLaunch
+  shell: cat ./kubeadmJoin 
+  register: kubeJoinLaunch
+
+- name: Ejecutamos el join
+  shell: "{{kubeJoinLaunch.stdout}}" 

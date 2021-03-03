@@ -1,0 +1,6 @@
+---
+# tasks file for configuracion_kubMaster
+- include_tasks: 1_KubernetesEnMaster.yml
+- include_tasks: 2_InstalacionCalico.yml
+- include_tasks: 3_IngressController.yml
+- include_tasks: 4_UsuarioNoAdministrador.yml
