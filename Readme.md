@@ -131,7 +131,7 @@ En el resultado obtendremos una lista de objetos con la siguiente estructura:
 
 `ansible-playbook -i hosts.yaml 2_ConfiguracionNFS.yml`
 
-### - Configuramos Kubernetes
+### - Configuramos Kubernetes
 
 `ansible-playbook -i hosts.yaml 3_ConfiguracionKubernetes.yml`
 
