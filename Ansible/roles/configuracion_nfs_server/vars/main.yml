@@ -1,0 +1,3 @@
+---
+# vars file for configuracion_nfs_server
+nfsPath: '/mnt/unir'

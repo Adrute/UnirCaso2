@@ -1,0 +1,10 @@
+---
+- name: Instalamos Ingress Controller
+  shell: |
+    kubectl apply -f {{ ingressControllerPath }}
+
+- name: Vemos el namespace creado para el Ingress Controller
+  shell: |
+    kubectl get namespaces
+    kubectl get pods --namespace=haproxy-controller
+    kubectl get svc -A

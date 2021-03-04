@@ -1,0 +1,3 @@
+---
+# vars file for roles/despliegue_app
+pathDespliegue: '/tmp/despliegueApp'
