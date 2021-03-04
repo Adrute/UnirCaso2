@@ -1,0 +1,6 @@
+- hosts: MasterNfs
+  order: sorted
+  gather_facts: yes
+  become: true
+  roles:
+    - despliegue_app

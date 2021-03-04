@@ -35,3 +35,5 @@ override.tf.json
 
 # Información sensible
 credentials.tf
+kubeadmJoin
+joinCommand

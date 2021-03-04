@@ -1,0 +1,5 @@
+---
+# vars file for configuracion_nfs_clients
+nfsPath: '/mnt/unir'
+nfsPathWorkers: '/mnt/unir'
+nfsIp: '10.0.1.10'

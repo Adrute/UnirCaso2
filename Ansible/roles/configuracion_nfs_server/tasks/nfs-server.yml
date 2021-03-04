@@ -1,0 +1,67 @@
+---
+- name: install nfs-utils
+  yum: name=nfs-utils state=latest
+
+- name: Creamos el directorio compartido si no existe
+  file:
+    path: '{{ nfsPath }}'
+    state: directory
+    owner: adminUsername
+    group: adminUsername
+    mode: '0775'
+    
+- name: Habilitamos rpcbind nfs-server nfs-idmapd
+  service:
+    name: '{{ item }}'
+    enabled: yes
+  with_items:
+    - rpcbind
+    #- nfs-lock >> Se comenta en el apartado de errores econtrados del documento
+    - nfs-server
+    - nfs-idmapd
+
+- name: Arrancamos rpcbind nfs-server nfs-idmapd
+  service:
+    name: '{{ item }}'
+    state: started
+  with_items:
+    - rpcbind
+    #- nfs-lock >> Se comenta en el apartado de errores econtrados del documento
+    - nfs-server
+    - nfs-idmapd
+
+- name: Copiamos el fichero exports
+  template:
+    src: ./ansible/exports.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Aplicamos el cambio en la configuración del NFS
+  shell: systemctl reload nfs-server;exportfs -a
+
+# No he conseguido añadir los servicios al firewall de esta forma por lo que se descarta
+# lo dejo comentado porque hago referencia a ello en el documento.
+#
+#- name: Se añaden los distintos servicios al firewall
+#  firewalld:
+#    service: "{{item}}"
+#    permanent: yes
+#    immediate : yes
+#    state: enabled
+#  with_items:
+#      - "nfs"
+#      - "rpc-bind"
+#      - "mountd"
+
+- name: Se añaden los distintos servicios al firewall
+  shell: |
+    firewall-cmd --permanent --zone=public --add-service=nfs
+    firewall-cmd --permanent --zone=public --add-service=mountd
+    firewall-cmd --permanent --zone=public --add-service=rpc-bind
+
+- name: Recarga Configuracion Firewall 
+  systemd:
+    name: firewalld
+    state: reloaded

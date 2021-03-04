@@ -1,0 +1,21 @@
+# En este Playbook se configurará la configuración inicial común a las máquinas
+
+- hosts: all
+  order: sorted
+  become: yes
+  roles:
+    - configuracion_kubAll
+
+- hosts: MasterNfs
+  order: sorted
+  gather_facts: yes
+  become: true
+  roles:
+    - configuracion_kubMaster
+
+- hosts: Workers
+  order: sorted
+  gather_facts: true
+  become: true
+  roles:
+    - configuracion_kubWorkers

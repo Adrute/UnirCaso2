@@ -1,0 +1,55 @@
+---
+#- name: 'dnf install epel-release'
+#  dnf:
+#    name: 'epel-release'
+#    state: 'latest'
+#
+#- name: Actualizacion de las maquina
+#  dnf:
+#     name: "*"
+#     state: latest
+
+- name: Timezone
+  shell: timedatectl set-timezone Europe/Madrid && timedatectl set-ntp true
+
+- name: Deshabilitamos Swap en todos los nodos
+  shell: swapoff -a
+
+- name: Comentamos todas las entradas de Swap en la ruta /etc/fstab
+  replace:
+    path: /etc/fstab
+    regexp: '(^/.*swap*)'
+    replace: '# \1'
+
+- name: 'Instalaciones'
+  dnf:
+    name: '{{ item }}'
+    state: 'latest'
+  loop:
+    - nfs-utils
+    - rpcbind
+    - chrony
+    - python3
+    - nfs4-acl-tools
+    - wget
+
+- name: Activar Chrony
+  service: 
+    name: chronyd
+    enabled: yes
+    state: started
+
+- name: Activar Firewalld
+  service:
+    name: firewalld
+    enabled: yes
+    state: started
+
+- name: Mapeo /etc/hosts
+  lineinfile:
+      path: /etc/hosts
+      line: "{{item.ip}} {{item.hostname}}"
+      state: present
+      create: yes
+  with_items:
+     - "{{ (hostvars[inventory_hostname]['publicIp']) }}"
