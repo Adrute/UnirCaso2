@@ -2,8 +2,7 @@
 - name: Creamos el usuario
   user:
     name: kubeadmin
-    password: "{{ 'kubeadmin' | password_hash('sha512') }}"
-  when:  assigned_role == "no"
+    home: '/home/kubeadmin'
 
 - name: Creacion Directorio 
   file:
@@ -19,11 +18,11 @@
 - name: Aplicamos los permisos correspondientes
   shell: chown kubeadmin. /home/kubeadmin/.kube/config
 
-- name: Configuración en /etc/sudoers.d/kubeadmin
-   lineinfile:
-       path: '/etc/sudoers.d/kubeadmin'
-       line: '{{item}}'
-       state: present
-       create: yes
-   with_items:
-      - 'ALL            ALL = (ALL) NOPASSWD: ALL'
+- name: Configuración en "/etc/sudoers.d/kubeadmin"
+  lineinfile:
+      path: '/etc/sudoers.d/kubeadmin'
+      line: '{{item}}'
+      state: present
+      create: yes
+  with_items:
+     - 'ALL            ALL = (ALL) NOPASSWD: ALL'

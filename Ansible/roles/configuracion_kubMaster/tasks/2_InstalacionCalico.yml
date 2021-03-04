@@ -9,14 +9,23 @@
     sed -i "13s/.*/      cidr: 192.169.0.0\/16/" custom-resources.yaml
     kubectl apply -f custom-resources.yaml
 
+# En la guía indica que puede tardar varios minutos en arranar por lo que se han planteado 2 opciones
+# 1.- Poner un sleep de 120 segundos para dejar un tiempo prudencial (normalmente no tarda más de 1 minuto)
+# 2.- Crear un bucle que lo revise cada 5 segundos con un máximo de 25 intentos y, en caso de aparecer Ready, 
+# continua el flujo. 
+#
+# Ciertamente, la segunda no es una solución definitiva 100% fiable pero de ambas parade la mejor por lo 
+# que se decide que sea la elegida.
+#
+# Finalmente se ha elegido la segunda opción
 - name: Esperar a que Master este READY
   shell: |
     /usr/bin/kubectl get nodes
-  register: nodes
+  register: shellOut
   until:      
-    - '" Ready "  in nodes.stdout'      
-  retries: 50
-  delay: 10
+    - '" Ready "  in shellOut.stdout'      
+  retries: 25
+  delay: 5
 
 # Añadido por si funciona calico en Azure
 - name: Calico Azure
