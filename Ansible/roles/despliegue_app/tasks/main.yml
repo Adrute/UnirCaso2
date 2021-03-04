@@ -1,2 +1,57 @@
 ---
 # tasks file for roles/despliegue_app
+- name: Creamos el directorio "/tmp/despliegueApp"
+  file:
+    path: "{{ pathDespliegue }}"
+    state: directory
+
+- name: Obtenemos los ficheros necesarios para el despliegue
+  copy:
+    src: ../files/{{ item }}.yaml
+    dest: "{{ pathDespliegue }}"
+  with_items:
+    - nfs-pv
+    - nfs-pvc
+    - webapp-volumes
+
+- name: Cambiamos la IP de nfs-pv
+  shell: |
+    sed -i "19s/.*/    server: {{ (hostvars[inventory_hostname]['publicIp'][0].ip) }}/" {{ pathDespliegue }}/nfs-pv.yaml
+
+- name: Creamos el namespace
+  shell: | 
+    kubectl create namespace webapp-volumes
+
+- name: Definimos el persistent volume
+  shell: |
+    kubectl apply -f {{ pathDespliegue }}/nfs-pv2.yaml
+    kubectl get pv --namespace=webapp-volumes
+    kubectl describe pv --namespace=webapp-volumes
+  register: pvOut
+
+- debug: var=pvOut.stdout_lines
+
+- name: Creamos el claim
+  shell: |
+    kubectl apply -f {{ pathDespliegue }}/nfs-pvc.yaml
+    kubectl get pvc --namespace=webapp-volumes
+    kubectl describe pvc nfs-pvc --namespace=webapp-volumes
+  register: pvcOut
+
+- debug: var=pvcOut.stdout_lines
+
+- name: Realizamos el deployment
+  shell: |
+    kubectl apply -f {{ pathDespliegue }}/webapp-volumes.yaml
+    kubectl get pods --namespace=webapp-volumes -o wide
+    kubectl get svc --namespace=webapp-volumes -o wide
+    kubectl describe svc volumes-service --namespace=webapp-volumes
+    kubectl get ep --namespace=webapp-volumes -o wide
+    kubectl describe ep volumes-service --namespace=webapp-volumes
+  register: deploymentOut
+
+- debug: var=deploymentOut.stdout_lines
+
+- name: Borramos el directorio con los ficheros
+  shell: |
+    rm -rf {{ pathDespliegue }}

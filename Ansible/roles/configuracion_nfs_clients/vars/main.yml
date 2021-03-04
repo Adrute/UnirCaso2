@@ -1,5 +1,5 @@
 ---
 # vars file for configuracion_nfs_clients
 nfsPath: '/mnt/unir'
-nfsPathWorkers: '/mnt/web_storage'
+nfsPathWorkers: '/mnt/unir'
 nfsIp: '10.0.1.10'
