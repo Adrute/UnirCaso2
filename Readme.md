@@ -88,6 +88,7 @@ terraform destroy
 Toda la configuración de ansible se encuenta en el directorio con el mismo nombre.
 
 ## Estructura
+```
 ├── Ansible
 │   ├── 1_ConfiguracionInicial.yml
 │   ├── 2_ConfiguracionNFS.yml
@@ -108,7 +109,8 @@ Toda la configuración de ansible se encuenta en el directorio con el mismo nomb
 │       ├── configuracion_nfs_server
 │       │   ├── ...
 │       └── despliegue_app
-│       │   ├── ...
+│       │   ├── ...
+```
 
 ## Pasos a seguir
 ### - IPs públicas de las máquinas
