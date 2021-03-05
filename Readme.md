@@ -21,13 +21,13 @@ az ad sp create-for-rbac --role="Contributor" -n "{{ NOMBRE_SERVICIO }}"
 
 Esto nos devolverá la siguiente estructura cuyos datos necesitaremos para poder continuar con el despliegue:
 ```
-	{
-	  "appId": "APP_ID",
-	  "displayName": "{{ NOMBRE_SERVICIO }}",
-	  "name": "http://{{ NOMBRE_SERVICIO }}",
-	  "password": "PASSWORD",
-	  "tenant": "TENANT"
-	}
+{
+  "appId": "APP_ID",
+  "displayName": "{{ NOMBRE_SERVICIO }}",
+  "name": "http://{{ NOMBRE_SERVICIO }}",
+  "password": "PASSWORD",
+  "tenant": "TENANT"
+}
 ```
 
 ### - Comandos útiles/necesarios durante el proceso
@@ -54,13 +54,17 @@ Generamos las claves pública/privada para poder conectar desde el PC a las máq
 Toda la configuración de terraform se encuenta en el directorio con el mismo nombre.
 
 ## Estructura
-- credentials.tf: No se añade en el repositorio GitHub dado que contiene información sensible (Se añade en .gitignore)
-- [main.tf](Terraform/main.tf): 
-- [network.tf](Terraform/network.tf)
-- [security.tf](Terraform/security.tf)
-- [vars.tf](Terraform/vars.tf): Variable para poder utilizar en el resto de ficheros de configuración
-- [vm.tf](Terraform/vm.tf): Contiene la configuración de las máquinas virtuales
-
+```
+├── Terraform
+│   ├── credentials.tf
+│   ├── main.tf
+│   ├── network.tf
+│   ├── security.tf
+│   ├── terraform.tfstate
+│   ├── terraform.tfstate.backup
+│   ├── vars.tf
+│   └── vm.tf
+```
 ## Pasos a seguir
 ### - Inicializar configuración
 ```
@@ -84,17 +88,36 @@ terraform destroy
 Toda la configuración de ansible se encuenta en el directorio con el mismo nombre.
 
 ## Estructura
+├── Ansible
+│   ├── 1_ConfiguracionInicial.yml
+│   ├── 2_ConfiguracionNFS.yml
+│   ├── 3_ConfiguracionKubernetes.yml
+│   ├── 4_DespliegueApp.yml
+│   ├── hosts.yaml
+│   └── roles
+│       ├── configuracion_comun
+│       │   ├── ...
+│       ├── configuracion_kubAll
+│       │   ├── ...
+│       ├── configuracion_kubMaster
+│       │   ├── ...
+│       ├── configuracion_kubWorkers
+│       │   ├── ...
+│       ├── configuracion_nfs_clients
+│       │   ├── ...
+│       ├── configuracion_nfs_server
+│       │   ├── ...
+│       └── despliegue_app
+│       │   ├── ...
 
 ## Pasos a seguir
 ### - IPs públicas de las máquinas
 Necesitamos obtener las IPs públicas de las máquinas que hemos creado para setearlas en el fichero "hosts.yaml". Para ello tenemos 2 formas:
 
 **Panel de control de Azure**
-
 Accedemos al apartado "[Máquinas virtuales](https://portal.azure.com/#blade/HubsExtension/BrowseResourceBlade/resourceType/Microsoft.Compute%2FVirtualMachines)" del panel de control de Azure y vamos entrando en cada máquina para revisar la información.
 
 **Utilizando "az cli"**
-
 Con el siguiente comando de "az cli" obtendremos una lista de las máquinas en la que podemos ver información de cada una de ellas (IP pública entre estos datos):
 
 `az vm list-ip-addresses`
@@ -124,18 +147,19 @@ En el resultado obtendremos una lista de objetos con la siguiente estructura:
 ```
 
 ### - Aplicamos la configuración común para todas las máquina
-
 `ansible-playbook -i hosts.yaml 1_ConfiguracionInicial.yml`
 
 ### - Configuramos las particiones NFS compartidas entre las máquinas
-
 `ansible-playbook -i hosts.yaml 2_ConfiguracionNFS.yml`
 
 ### - Configuramos Kubernetes
-
 `ansible-playbook -i hosts.yaml 3_ConfiguracionKubernetes.yml`
 
+### - Desplegamos la aplicación
+`ansible-playbook -i hosts.yaml 4_DespliegueApp.yml`
+
 # 4) Datos de interés
+
 - La estructura de los distintos roles se ha generado con "ansible-galaxy" de la siguiente forma:
 ```
 ## Dentro de la carpeta roles:
